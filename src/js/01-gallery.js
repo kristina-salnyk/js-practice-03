@@ -1,8 +1,6 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.css';
-// Add imports above this line
 import { galleryItems } from './gallery-items';
-// Change code below this line
 
 const gallaryRef = document.querySelector('div.gallery');
 
@@ -20,7 +18,7 @@ if ('loading' in HTMLImageElement.prototype) {
     img.src = img.dataset.src;
   });
 } else {
-  const lazySizes = require('lazysizes');
+  require('lazysizes');
 }
 
 const lightbox = new SimpleLightbox('.gallery a', {
