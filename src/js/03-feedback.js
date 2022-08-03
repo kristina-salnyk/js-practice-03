@@ -1,33 +1,51 @@
-import localStorageService from './localStorageService';
+import localStorageService from './local-storage-service';
+import localStorageKeys from './local-storage-keys';
 import throttle from 'lodash.throttle';
 
 const feedbackFormRef = document.querySelector('form.feedback-form');
-const feedbackFormState = localStorageService.load('feedback-form-state');
+const feedbackFormState = localStorageService.load(
+  localStorageKeys.FEEDBACK_FORM_STATE
+);
 
 function feedbackFormInputHandler() {
-  const { email, message } = this.elements;
-  localStorageService.save('feedback-form-state', {
-    email: email.value,
-    message: message.value,
-  });
+  localStorageService.save(
+    localStorageKeys.FEEDBACK_FORM_STATE,
+    getFormTextFields(this)
+  );
 }
 
 function feedbackFormSubmitHandler(event) {
   event.preventDefault();
 
-  const { email, message } = this.elements;
-  console.log({
-    email: email.value,
-    message: message.value,
-  });
+  const formTextFields = getFormTextFields(this);
 
-  localStorageService.remove('feedback-form-state');
+  for (const key of Object.keys(formTextFields)) {
+    if (!feedbackFormRef.elements[key].value) {
+      alert('All fields of the form must be completed');
+      return;
+    }
+  }
+
+  console.log(formTextFields);
+  localStorageService.remove(localStorageKeys.FEEDBACK_FORM_STATE);
   this.reset();
 }
 
+function getFormTextFields(form) {
+  const formTextFieldsArray = [...form.elements]
+    .filter(
+      element => element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA'
+    )
+    .map(element => [element.name, element.value]);
+
+  return Object.fromEntries(formTextFieldsArray);
+}
+
 if (feedbackFormState) {
-  feedbackFormRef.elements.email.value = feedbackFormState.email;
-  feedbackFormRef.elements.message.value = feedbackFormState.message;
+  for (const key of Object.keys(feedbackFormState)) {
+    if (feedbackFormRef.elements[key])
+      feedbackFormRef.elements[key].value = feedbackFormState[key];
+  }
 }
 
 feedbackFormRef.addEventListener(
